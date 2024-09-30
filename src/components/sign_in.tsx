@@ -75,17 +75,24 @@ const SignIn = () => {
 			if (axios.isAxiosError(error) && error.response) {
         const errorResponse = error.response.data as APIResponse;
 				
-				const formattedErrors: { [key: string]: string } = {};
-				
-				for (const errorItem of errorResponse.errors) {
-					for (const field in errorItem) {
-						const messages = errorItem[field] as string[];
-						formattedErrors[field] = messages.join(', ');
-					}
-				}
+				if (errorResponse.status_code !== 500) {
+					const formattedErrors: { [key: string]: string } = {};
+					
+					for (const errorItem of errorResponse.errors) {
+						for (const field in errorItem) {
+							const messages = errorItem[field] as string[];
 
-				setServerErrors(formattedErrors);
+							formattedErrors[field] = messages?.join(', ');
+						}
+					}
+
+					setServerErrors(formattedErrors);
+				}
+				
+				toast.error(JSON.stringify(errorResponse.message));
       } else {
+        console.error('An unexpected error occurred:', error);
+
         console.error('An unexpected error occurred:', error);
       }
     }
